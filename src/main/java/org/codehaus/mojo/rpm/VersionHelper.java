@@ -44,6 +44,8 @@ import org.apache.maven.plugin.MojoExecutionException;
  */
 final class VersionHelper
 {
+    final static String DIST_MACRO = "{?dist}";
+
     /**
      * Wraps the version and release components that make up the entire version.
      */
@@ -91,7 +93,6 @@ final class VersionHelper
      */
     Version calculateVersion()
     {
-        final String distMacro = "{?dist}";
         final Version response = new Version();
 
         final String version = mojo.getVersion();
@@ -136,16 +137,17 @@ final class VersionHelper
             }
         }
 
-        if( response.release.contains(distMacro) )
+        if( response.release.contains(DIST_MACRO) )
         {
             String distribution;
             try
             {
-                distribution = RPMHelper.evaluateMacro(distMacro,mojo.getLog());
-                response.release = response.release.replace("%" + distMacro, distribution);
+                distribution = RPMHelper.evaluateMacro( DIST_MACRO, mojo.getLog() );
+                response.release = response.release.replace("%" + DIST_MACRO, distribution );
                 if ( mojo.getLog().isDebugEnabled() )
                 {
-                    mojo.getLog().debug("Found macro >" + distMacro + "< in release, system's distribution is resolved as >" + distribution + "<");
+                    mojo.getLog().debug("Found macro >" + DIST_MACRO + "< in release " + response.release +
+                            ", system's distribution is resolved as >" + distribution + "<");
                 }
             }
             catch (MojoExecutionException e)
