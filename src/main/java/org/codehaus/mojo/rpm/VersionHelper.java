@@ -116,7 +116,7 @@ final class VersionHelper
             response.version = version.substring( 0, modifierIndex );
             mojo.getLog().warn( "rpm version string truncated to " + response.version );
 
-            if ( release == null || release.length() == 0 )
+            if (release == null || release.length() == 0 || release.equals("%" + DIST_MACRO))
             {
                 String modifier = version.substring( modifierIndex + 1, version.length() );
 
@@ -133,7 +133,7 @@ final class VersionHelper
                     modifier += "_1";
                 }
 
-                response.release = modifier;
+                response.release = release != null ? modifier + release : modifier;
             }
         }
 
