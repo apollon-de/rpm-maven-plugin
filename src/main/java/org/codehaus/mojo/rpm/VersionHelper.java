@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import org.apache.maven.plugin.Mojo;
+import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * Assists in calculating an rpm compatible version and build number (release) from the maven version.
@@ -90,6 +91,7 @@ final class VersionHelper
      */
     Version calculateVersion()
     {
+        final String distMacro = "{?dist}";
         final Version response = new Version();
 
         final String version = mojo.getVersion();
@@ -131,6 +133,24 @@ final class VersionHelper
                 }
 
                 response.release = modifier;
+            }
+        }
+
+        if( response.release.contains(distMacro) )
+        {
+            String distribution;
+            try
+            {
+                distribution = RPMHelper.evaluateMacro(distMacro,mojo.getLog());
+                response.release = response.release.replace("%" + distMacro, distribution);
+                if ( mojo.getLog().isDebugEnabled() )
+                {
+                    mojo.getLog().debug("Found macro >" + distMacro + "< in release, system's distribution is resolved as >" + distribution + "<");
+                }
+            }
+            catch (MojoExecutionException e)
+            {
+                mojo.getLog().error(e);
             }
         }
 
