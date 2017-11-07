@@ -940,8 +940,9 @@ abstract class AbstractRPMMojo
 		}
 	}
 
-        // calculate versions if neccessary, check for existing maven modifier and split them accordingly
-        if ( this.projversion == null || this.release == null || this.projversion.contains( "-" ) )
+        // calculate versions if necessary, check for existing maven modifier and split them accordingly
+        if ( this.projversion == null || this.release == null || this.projversion.contains( "-" )
+                || this.release.contains(VersionHelper.DIST_MACRO) )
         { // including -SNAPSHOT and 1-34
             final VersionHelper.Version version = new VersionHelper( this ).calculateVersion();
             this.projversion = version.version;
